@@ -85,6 +85,7 @@ void init (void)
       }
       return a;
   }
+
 void main (void)
 {
   unsigned int compteur;
@@ -92,21 +93,21 @@ void main (void)
   unsigned int s;
   char c;
   int i;
-int mini1=2000, moy1=100, maxi1=0,mini2=2000, moy2=100, maxi2=0,mini3=2000, moy3=100, maxi3=0;
-
+  int mini1=2000, moy1=100, maxi1=0,mini2=2000, moy2=100, maxi2=0,mini3=2000, moy3=100, maxi3=0;
   unsigned int d,m,g;
 
-  // Initalisations
   //init ();
-  
-//  do
-//    {
-//      printf ((constStringPtr_t) "Appuyez sur la touche 's' pour démarrer\n");
-//      c = bluetoothRN4xReadChar ();
-//      timeDelayMillisecond (1000);
-//    } while (c != 's');
+
+  do
+    {
+      printf ((constStringPtr_t) "Appuyez sur la touche 's' pour démarrer\n");
+      c = bluetoothRN4xReadChar ();
+      timeDelayMillisecond (1000);
+    } 
+  while (c != 's');
   printf ((constStringPtr_t) "Start ok\n");
   
+  // calibrage moy demarrage
   driveMotor (COMMAND_MOTOR_LEFT, 160, -160);
   for ( i = 0; i < 16; i++)
     {
@@ -129,25 +130,39 @@ int mini1=2000, moy1=100, maxi1=0,mini2=2000, moy2=100, maxi2=0,mini3=2000, moy3
     printf((constStringPtr_t)"Valeur moym = %u\n", moy2);
     printf((constStringPtr_t)"Valeur moyg = %u\n", moy3);
     driveMotor (COMMAND_MOTOR_STOP, 0, 0);
-  
+      
   compteur = 0;
            
   // Boucle principale
   while (FOREVER)
     {
       timeDelayMillisecond (BASE_DE_TEMPS);
-
       clignotementLed ();
-      
       c = bluetoothRN4xGetkey ();
       
       d = analogRead(0) ; //On lit le port 0
       m = analogRead(1) ;
       g = analogRead(2) ;
     
-      printf ((constStringPtr_t) "Valeur d = %u\n", d);
-      printf ((constStringPtr_t) "Valeur m = %u\n", m);
-      printf ((constStringPtr_t) "Valeur g = %u\n", g);
-  }
+      if (m>moy2)
+        {
+            if (d<moy1)
+            {
+                driveMotor (COMMAND_MOTOR_FORWARD, 60, 80); //si capteur droit sort ligne alors pousse legerement plus a gauche
+            }
+            if (g<moy3) //capt de gauche plus sur ligne
+            {
+                driveMotor (COMMAND_MOTOR_FORWARD, 80, 60);
+            }
+            elif 
+            {
+              driveMotor (COMMAND_MOTOR_FORWARD, 80, 80); //3 capteurs pas possible sur ligne en meme tps si milieu pile au centre alors d et g sont passur ligne 
+            }
+      }
 
+      else //si milieu sort de la ligne 
+      {
+          driveMotor (COMMAND_MOTOR_STOP, 0, 0);
+      }  
+  }
 }
